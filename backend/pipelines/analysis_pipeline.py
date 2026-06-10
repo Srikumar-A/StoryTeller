@@ -8,14 +8,15 @@ class AnalysisPipeline:
 
     def run_dsp(self):
         fingerprint=self.get_spectral_timbral_fingerprint(self.track1)
+        feature1=self.get_tempo_beats(self.track1)
 
 
-        return {"fingerprint":fingerprint}
+        return {"fingerprint":fingerprint,
+                "beat":feature1["beats"],
+                "tempo":feature1["tempo"]
+                }
     
     def run_ml(self):
-        pass
-
-    def get_tempo(self)->float:
         pass
 
     def get_key(self):
@@ -37,9 +38,17 @@ class AnalysisPipeline:
         #MFCC
         mfcc=librosa.feature.mfcc(y=track,sr=22050)
 
-        return {'mel_spectrogram':mel_spectrogram,
+        return {
+                'mel_spectrogram':mel_spectrogram,
                 'spectral_centroid':spec_centroid,
                 'bandwidth':bandwidth,
                 'rolloff':roll_off,
-                'mfcc':mfcc}
-        
+                'mfcc':mfcc
+                }
+    
+
+    def get_tempo_beats(self,track):
+        tempo=librosa.beat.tempo(y=track,sr=22050,aggregate=None)
+        temp,beats=librosa.beat.beat_track(y=track,sr=22050)
+
+        return {"tempo":tempo,"beats":beats}
